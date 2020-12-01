@@ -1,0 +1,22 @@
+{% extends 'general/base.html' %}
+
+{% block title %}403{% endblock %}
+
+{% block content %}
+  <div class="col-lg-8 mx-auto pt-5">
+    <div class="text-center pt-5">
+      <h2>Доступ запрещен. 403</h2>
+      {% if msg %}
+        <h5>{{msg}}</h5>
+      {% else %}
+        <h5>Похоже, что доступ к этой странице запрещен.</h5>
+      {% endif %}
+      {% if request.META.HTTP_REFERER %}
+        <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-dark mt-2">Вернуться назад</a>
+      {% else %}
+        <a href="{% url 'general:index' %}" class="btn btn-dark mt-2">Вернуться на главную</a>
+      {% endif %}
+      <h1 class="text-center pt-5">😣</h1>
+    </div>
+  </div>
+{% endblock %}

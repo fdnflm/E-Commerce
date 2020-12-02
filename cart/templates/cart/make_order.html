@@ -1,0 +1,55 @@
+{% extends "general/base.html" %}
+
+{% load static %}
+
+{% block title %}Заказ{% endblock %}
+
+{% block content %}
+<div class="col-lg-5 mx-auto pt-4">
+  {% include 'messages.html' %}
+  <div class="card">
+    <form action="{% url 'cart:payment_hook' %}" method="post">
+      <div class="card-body">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-lg-12 mb-3">
+            <label for="cc-name">Имя на карте</label>
+            <input type="text" class="form-control" id="cc-name" placeholder="NO NAME" disabled>
+            <div class="invalid-feedback">
+              Name on card is required
+            </div>
+            <br>
+            <label for="cc-number">Номер карты</label>
+            <input type="text" class="form-control" id="cc-number" placeholder="1337 2280 1488 3220" disabled>
+            <div class="invalid-feedback">
+              Credit card number is required
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="cc-expiration">Срок действия (до)</label>
+            <input type="text" class="form-control date" id="cc-expiration" placeholder="22.08.1337" disabled>
+            <div class="invalid-feedback">
+              Expiration date required
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="cc-expiration">CVV</label>
+            <input type="password" class="form-control" id="cc-cvv" placeholder="228" disabled>
+            <div class="invalid-feedback">
+              Security code required
+            </div>
+          </div>
+        </div>
+        <small class="text-muted">Это всего лишь имитация</small>
+        <hr>
+      </div>
+      <div class="card-footer">
+        <span>Итого: {{ price|floatformat:2 }} руб.</span>
+        <button type="submit" class="btn btn-success btn-sm float-right">Подтвердить</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -31,7 +31,8 @@ def user_login(request):
     else:
         form = UserLoginForm(request)
 
-    context = {'form': form, 'next': request.GET['next']}
+    next = request.GET.get('next') if request.GET.get('next') else ''
+    context = {'form': form, 'next': next}
     return render(request, 'auth_v2/login.html', context)
 
 

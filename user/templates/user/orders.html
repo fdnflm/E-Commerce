@@ -1,0 +1,58 @@
+{% extends "general/base.html" %}
+
+{% load static %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block content %}
+<div class="col-lg-8 mx-auto pt-4">
+  {% include 'messages.html' %}
+  {% for order in orders%}
+    <div class="card mb-5">
+      <div class="mt-3 ml-3">
+        <h5>
+          Заказ <a href="{% url 'user:view_order' order.transaction_id %}">#{{ order.transaction_id }}</a>
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Товар</th>
+                <th scope="col">Кол-во (шт)</th>
+                <th scope="col">Стоимость (руб)</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in order.items.all %}
+                <tr>
+                  <th scope="row">{{ forloop.counter }}</th>
+                  <td><a href="{% url 'general:item' item.product.slug %}">{{ item.product.name }}</a></td>
+                  <td>
+                    {{ item.amount }}
+                  </td>
+                  <td>{{ item.total_price|floatformat:2 }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5">Нет товаров</td>
+                </tr>
+              {% endfor %}
+              <tr class="table-success">
+                <td colspan="3">Итого</td>
+                <td>{{ order.total_price|floatformat:2 }}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <h4 class="text-center">Вы пока не совершали заказов</h4>
+  {% endfor %}
+</div>
+{% endblock %}

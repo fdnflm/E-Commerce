@@ -1,0 +1,245 @@
+{% extends "general/base.html" %}
+
+{% load static %}
+
+{% block title %}Настройки пользователя {{ user.username }}{% endblock %}
+
+{% block content %}
+{% include 'messages.html' %}
+  <div class="row pt-4">
+    <div class="col-md-4 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex flex-column align-items-center text-center">
+            <img src="{{ user.avatar.url }}" alt="profile picture" class="rounded-circle" width="150">
+            <div class="mt-3">
+              <h4>{{ user.username }}</h4>
+              <p class="text-secondary mb-1">{{ user.first_name }} {{ user.last_name }}</p>
+              <p class="text-muted font-size-sm">
+                {% if user.is_premium %}
+                <span>Подписка актвина до {{ user.paid_until|date:"d.m.Y" }}</span>
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card mt-3">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+            <h6 class="mb-0">Статус</h6>
+            <span class="{% if user.is_premium %}text-warning{% else %}text-secondary{% endif %}">
+              {% if user.is_premium %}
+                Premium
+              {% else %}
+                Default
+              {% endif %}
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+            <h6 class="mb-0">Скидка</h6>
+            <span>
+              {{ user.discount }}%
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+            <h6 class="mb-0">Бонусы</h6>
+            <span>{{ user.bonus }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+            <h6 class="mb-0">Подписка</h6>
+            <span class="{% if user.is_premium %}text-success{% else %}text-danger{% endif %}">
+            {% if user.is_premium %}
+            Активна
+            {% else %}
+            Нет
+            {% endif %}
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+            <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#subscriptionExtend">
+              {% if user.is_premium %}
+                Продлить подписку
+              {% else %}
+                Купить подписку
+              {% endif %}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-3">
+              <h6 class="mb-0">Полное имя</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+              {{ user.first_name }} {{ user.last_name }}
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <h6 class="mb-0">Email</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+              {{ user.email }}
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <h6 class="mb-0">Телефон</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+              +{{ user.phone_number }}
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <h6 class="mb-0">Telegram</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+              {% if user.telegram %}
+              @{{ user.telegram }}
+              {% else %}
+              -
+              {% endif %}
+            </div>
+          </div>
+          <hr>
+          <small class="text-muted">Последний вход: {{ user.last_login }}</small>
+          <button data-toggle="modal" data-target="#changeInfo" class="btn btn-primary float-right">Изменить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- Modal -->
+  <div class="modal fade" id="subscriptionExtend" tabindex="-1" role="dialog" aria-labelledby="subscriptionExtendLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="">Подписка</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="{% url 'user:add_premium' %}" method="POST">
+          {% csrf_token %}
+          <div class="modal-body">
+            <h5>Что даёт подписка?</h5>
+            <ul>
+              <li>Подписка даёт вам скидки и бонусы на товары в магазине</li>
+              <li>Ваша скидка по умолчанию увеличивается <strong>до 10%</strong></li>
+              <li>Вы получаете кэшбек в виде бонусов за каждую покупку</li>
+              <li>Бонусами можно оплатить до 100% покупки</li>
+            </ul>
+            <div class="form-group">
+              <label for="days-input">Кол-во дней</label>
+              <select class="custom-select" name="days" id="days-input" required>
+                <option value="0" selected>Выберите кол-во дней</option>
+                <option value="1">30 дней</option>
+                <option value="2">90 дней</option>
+                <option value="3">365 дней</option>
+              </select>
+            </div>
+            <h6>Итого: <span class="text-success" id="submoney">0</span> руб.</h6>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            <button type="submit" id='subpay' class="btn btn-success">Оформить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+   <!-- Modal -->
+  <div class="modal fade" id="changeInfo" tabindex="-1" role="dialog" aria-labelledby="changeInfoLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="">Изменить информацию</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="{% url 'user:settings' %}" method="POST">
+          {% csrf_token %}
+          <div class="modal-body">
+
+            <div class="form-group">
+              <label for="{{ form.username.id_for_label }}">Никнейм</label>
+              {{ form.username }}
+              {{ form.username.errors }}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.first_name.id_for_label }}">Имя</label>
+              {{ form.first_name }}
+              {{ form.first_name.errors }}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.last_name.id_for_label }}">Фамилия</label>
+              {{ form.last_name }}
+              {{ form.last_name.errors }}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.email.id_for_label }}">Email</label>
+              {{ form.email }}
+              {{ form.email.errors }}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.phone_number.id_for_label }}">Телефон</label>
+              {{ form.phone_number }}
+              {{ form.phone_number.errors }}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.telegram.id_for_label }}">Telegram</label>
+              {{ form.telegram }}
+              {{ form.telegram.errors }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            <button type="submit" id='subpay' class="btn btn-primary">Применить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    jQuery(window).on("load", function(){
+        $('#days-input option:first').prop('selected', true);
+        $('#subpay').prop('disabled', true);
+    });
+
+    $('#days-input').change(function(){
+
+        if ($(this).val() === '0'){
+            $('#submoney').text("0");
+            $('#subpay').prop('disabled', true);
+        }
+        else{
+            $('#subpay').prop('disabled', false);
+        }
+        if ($(this).val() === '1'){
+            $('#submoney').text("190");
+        }
+        if ($(this).val() === '2'){
+            $('#submoney').text("490");
+        }
+        if ($(this).val() === '3'){
+            $('#submoney').text("1990");
+        }
+    })
+  </script>
+{% endblock %}

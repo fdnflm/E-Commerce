@@ -1,0 +1,25 @@
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+.product {
+  transition: 0.3s ease-in-out;
+  text-decoration: none;
+}
+
+.product:hover {
+  transform: scale(1.07);
+  -webkit-transform: scale(1.07);
+}
+
+.product-img {
+  border: 0 !important;
+  border-top-left-radius: 1rem !important;
+  border-top-right-radius: 1rem !important;
+}
+
+.promo-list {
+  border-radius: 30px;
+}

@@ -1,0 +1,101 @@
+{% extends "general/base.html" %}
+
+{% load static %}
+{% load tasty_price %}
+
+{% block static %}
+<link rel="stylesheet" href="{% static 'general/css/style.css' %}">
+{% endblock %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-9">
+    {% for message in messages %}
+      <div class="alert alert-info mt-3" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+    <div id="indicator" class="carousel slide my-4" data-ride="carousel">
+      <div class="carousel-inner promo-list" role="listbox">
+        {% for promo in top_day %}
+          <div class="carousel-item{% if promo == top_day.0 %} active{% endif %}">
+            <a href="{% if promo.linked_product %}{% url 'general:item' promo.linked_product.slug %}{% else %}#{% endif %}">
+            <img class="d-block img-fluid" src="{{ promo.image.url }}" alt="promo">
+            </a>
+          </div>
+        {% empty %}
+          <div class="carousel-item active">
+            <img class="d-block img-fluid" src="{% static 'images/default_promo.png' %}" alt="promo">
+          </div>
+        {% endfor %}
+      </div>
+      <a class="carousel-control-prev" href="#indicator" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#indicator" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+      </a>
+    </div>
+    <div class="row">
+      {% for product in products %}
+        {% if product.amount > 0 %}
+          <div class="col-lg-4 col-md-6 mb-4">
+            <a href="{% url 'general:item' product.slug %}" class="text-decoration-none text-body">
+              <div class="card product h-100">
+                <img class="card-img-top product-img" src="{{ product.image.url }}" alt="">
+                <div class="card-body">
+                  <span class="card-title product-title">
+                  <span class="text-body">{{ product.name|title|truncatechars:20 }}</span>
+                  </span>
+                  {% if product.description %}
+                    <hr>
+                    <p class="card-text">{{ product.description|truncatechars:40 }}</p>
+                  {% endif %}
+                </div>
+                <div class="card-footer">
+                  <span class="text-success price">
+                  {% if not user.is_premium and not product.discount %}
+                    {{ product.price|floatformat:2 }} руб.
+                  {% else %}
+                    <strike>{{ product.price|floatformat:2 }}</strike>
+                    {% tasty_price product user.discount %} руб.
+                  {% endif %}
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <!-- /.col-lg-9 -->
+  <div class="col-lg-3">
+    <!-- Search Widget -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Найти...">
+          <span class="input-group-append">
+          <button class="btn btn-secondary" onclick="alert('Поиск в разработке')" type="button"><i class="fa fa-search"></i></button>
+          </span>
+        </div>
+      </div>
+    </div>
+    {% for promo in promos %}
+      {% if promo.promo_type == 'side_ad' and promo.enabled and promo.is_future_due %}
+        <div class="card mt-4">
+          <a href="{% if promo.linked_url %}{% url 'general:item' promo.linked_product.id %}{% else %}{{ promo.url }}{% endif %}">
+          <img src="{{ promo.image.url }}" class="promo-side" alt="ad">
+          </a>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+<!-- /.row -->
+{% endblock %}

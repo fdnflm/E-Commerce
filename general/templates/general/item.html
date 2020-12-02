@@ -1,0 +1,81 @@
+{% extends "general/base.html" %}
+
+{% load static %}
+{% load tasty_price %}
+
+{% block static %}
+<link rel="stylesheet" href="{% static 'general/css/style.css' %}">
+{% endblock %}
+
+{% block title %}Товар {{ product.name|title }}{% endblock %}
+
+{% block content %}
+<div class="row flex-md-row-reverse">
+  <div class="col-md-3 col-md-push-3 text-center">
+    <div id="buy" class="sticky">
+      <div class="card mt-4">
+        <div class="p-3">
+          <form action="{% url 'cart:cart_add' product.id %}" method="POST">
+            {% csrf_token %}
+            {{ cart_product_form }}
+            <input type="submit" class="btn btn-success btn-block mb-2" value="Добавить в корзину">
+          </form>
+        </div>
+      </div>
+      {% if product.amount > 0 %}
+        <small class="text-muted pb-5">
+        Осталось {{ product.amount }} шт.
+      {% else %}
+        <small class="text-danger pb-5">
+        Товара нет в наличии
+      {% endif %}
+      </small>
+    </div>
+  </div>
+  <div class="col-md-9 col-md-pull-9">
+    {% include 'messages.html' %}
+    <div class="card mt-4 mb-5">
+      <img class="card-img-top img-fluid product-img" src="{{ product.image.url }}" alt="">
+      <div class="card-body">
+        <span class="card-title product-title">{{ product.name|title }}</span>
+        <span class="text-success price">
+        {% if not user.is_premium and not product.discount %}
+          {{ product.price|floatformat:2 }} руб.
+        {% else %}
+          <strike>{{ product.price|floatformat:2 }}</strike>
+          {% tasty_price product user.discount %} руб.
+        {% endif %}
+        </span>
+        {% if product.description %}
+          <hr>
+          <p class="card-text">{{ product.description|linebreaks }}</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card my-4">
+      <div class="card-header">
+        Отзывы о товаре
+        <a href="#" class="btn btn-primary btn-sm float-right">Оставить отзыв</a>
+      </div>
+      <div class="card-body">
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis et enim aperiam inventore, similique necessitatibus neque non! Doloribus, modi sapiente laboriosam aperiam fugiat laborum. Sequi mollitia, necessitatibus quae sint natus.</p>
+        <small class="text-muted">Posted by Anonymous on 3/1/17</small>
+        <hr>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis et enim aperiam inventore, similique necessitatibus neque non! Doloribus, modi sapiente laboriosam aperiam fugiat laborum. Sequi mollitia, necessitatibus quae sint natus.</p>
+        <small class="text-muted">Posted by Anonymous on 3/1/17</small>
+        <hr>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis et enim aperiam inventore, similique necessitatibus neque non! Doloribus, modi sapiente laboriosam aperiam fugiat laborum. Sequi mollitia, necessitatibus quae sint natus.</p>
+        <small class="text-muted">Posted by Anonymous on 3/1/17</small>
+        <hr>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  window.addEventListener('scroll', function() {
+      if (pageYOffset > 0){
+        document.getElementById("buy").style.top = "70px";
+      }
+  });
+</script>
+{% endblock %}

@@ -12,11 +12,7 @@
 {% block content %}
 <div class="row">
   <div class="col-lg-9">
-    {% for message in messages %}
-      <div class="alert alert-info mt-3" role="alert">
-        {{ message }}
-      </div>
-    {% endfor %}
+    {% include 'messages.html' %}
     <div id="indicator" class="carousel slide my-4" data-ride="carousel">
       <div class="carousel-inner promo-list" role="listbox">
         {% for promo in top_day %}
